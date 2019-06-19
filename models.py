@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+from torch.nn import init
 import numpy as np
 
 from utils.parse_config import *
@@ -244,10 +245,13 @@ class Darknet(nn.Module):
         self.header_info = np.array([0, 0, 0, self.seen, 0], dtype=np.int32)
 
     def forward(self, x, targets=None):
+
         img_dim = x.shape[2]
         loss = 0
         layer_outputs, yolo_outputs = [], []
+
         for i, (module_def, module) in enumerate(zip(self.module_defs, self.module_list)):
+
             if module_def["type"] in ["convolutional", "upsample", "maxpool"]:
                 x = module(x)
             elif module_def["type"] == "route":
@@ -260,8 +264,16 @@ class Darknet(nn.Module):
                 loss += layer_loss
                 yolo_outputs.append(x)
             layer_outputs.append(x)
+
         yolo_outputs = to_cpu(torch.cat(yolo_outputs, 1))
-        return yolo_outputs if targets is None else (loss, yolo_outputs)
+        # print("yolo_outputs: ", len(yolo_outputs))
+
+        if targets is None:
+            return yolo_outputs
+        else:
+            return (loss, yolo_outputs)
+
+        # return yolo_outputs if targets is None else (loss, yolo_outputs)
 
     def load_darknet_weights(self, weights_path):
         """Parses and loads the weights stored in 'weights_path'"""

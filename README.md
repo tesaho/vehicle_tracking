@@ -1,95 +1,150 @@
-# PyTorch-YOLOv3
-A minimal PyTorch implementation of YOLOv3, with support for training, inference and evaluation.
+# pytorch_yolov3
+This is a implementation of YOLOv3 based off of Erik Lindernoren's [PyTorch_YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3).
+
+For vehicle detection, the training set was composed of images from Stanford's Cars dataset and combined with hand relabelled
+images from NEXET cars dataset.  
 
 ## Installation
 ##### Clone and install requirements
-    $ git clone https://github.com/eriklindernoren/PyTorch-YOLOv3
-    $ cd PyTorch-YOLOv3/
+    $ git clone https://github.com/tesaho/pytorch_yolov3
+    $ cd pytorch_yolov3/
     $ sudo pip3 install -r requirements.txt
 
 ##### Download pretrained weights
     $ cd weights/
     $ bash download_weights.sh
 
-##### Download COCO
+##### Unzip cars.zip
     $ cd data/
-    $ bash get_coco_dataset.sh
-    
-## Test
-Evaluates the model on COCO test.
-
-    $ python3 test.py --weights_path weights/yolov3.weights
-
-| Model                   | mAP (min. 50 IoU) |
-| ----------------------- |:-----------------:|
-| YOLOv3 608 (paper)      | 57.9              |
-| YOLOv3 608 (this impl.) | 57.3              |
-| YOLOv3 416 (paper)      | 55.3              |
-| YOLOv3 416 (this impl.) | 55.5              |
-
-## Inference
-Uses pretrained weights to make predictions on images. Below table displays the inference times when using as inputs images scaled to 256x256. The ResNet backbone measurements are taken from the YOLOv3 paper. The Darknet-53 measurement marked shows the inference time of this implementation on my 1080ti card.
-
-| Backbone                | GPU      | FPS      |
-| ----------------------- |:--------:|:--------:|
-| ResNet-101              | Titan X  | 53       |
-| ResNet-152              | Titan X  | 37       |
-| Darknet-53 (paper)      | Titan X  | 76       |
-| Darknet-53 (this impl.) | 1080ti   | 74       |
-
-    $ python3 detect.py --image_folder data/samples/
-
-<p align="center"><img src="assets/giraffe.png" width="480"\></p>
-<p align="center"><img src="assets/dog.png" width="480"\></p>
-<p align="center"><img src="assets/traffic.png" width="480"\></p>
-<p align="center"><img src="assets/messi.png" width="480"\></p>
+    $ unzip cars.zip .
 
 ## Train
+Train a model and save in a folder MODEL_NAME. Additional features:
+
+- re-start at a specific checkpoint RESTART_POINT.
+- hyperparameter optimization (CONF_THRES, NMS_THRES, IOU_THRES, LEARNING_RATE)
+
+Outputs the following in MODEL_NAME/:
+
+- checkpoints/ (model weights)
+- logs/ (tensorboard log files)
+- outputs/parameters.txt
+- outputs/valiation_maps.csv
+
 ```
-$ train.py [-h] [--epochs EPOCHS] [--batch_size BATCH_SIZE]
+$ python3 train.py [-h] [--model_name MODEL_NAME]
+                [--epochs EPOCHS] 
+                [--batch_size BATCH_SIZE]
                 [--gradient_accumulations GRADIENT_ACCUMULATIONS]
-                [--model_def MODEL_DEF] [--data_config DATA_CONFIG]
-                [--pretrained_weights PRETRAINED_WEIGHTS] [--n_cpu N_CPU]
+                [--model_def MODEL_DEF] 
+                [--data_config DATA_CONFIG]
+                [--pretrained_weights PRETRAINED_WEIGHTS] 
+                [--n_cpu N_CPU]
                 [--img_size IMG_SIZE]
                 [--checkpoint_interval CHECKPOINT_INTERVAL]
+                [--restart_point RESTART_POINT]
                 [--evaluation_interval EVALUATION_INTERVAL]
                 [--compute_map COMPUTE_MAP]
                 [--multiscale_training MULTISCALE_TRAINING]
+                [--conf_thres CONF_THRES]
+                [--nms_thres NMS_THRES]
+                [--iou_thres IOU_THRES]
+                [--optimizer OPTIMIZER]
+                [--learning_rate LEARNING_RATE]
+                
 ```
 
-#### Example (COCO)
-To train on COCO using a Darknet-53 backend pretrained on ImageNet run: 
+#### Train example
+To train on cars data set using a Darknet-53 backend pretrained on ImageNet run: 
 ```
-$ python3 train.py --data_config config/coco.data  --pretrained_weights weights/darknet53.conv.74
+$ python3 train.py --model_name darknet_cars --epochs=10 --data_config config/cars_small.data  --pretrained_weights weights/darknet53.conv.74
 ```
 
 #### Training log
 ```
----- [Epoch 7/100, Batch 7300/14658] ----
+---- [Epoch 2/2, Batch 0/2] ----
 +------------+--------------+--------------+--------------+
 | Metrics    | YOLO Layer 0 | YOLO Layer 1 | YOLO Layer 2 |
 +------------+--------------+--------------+--------------+
-| grid_size  | 16           | 32           | 64           |
-| loss       | 1.554926     | 1.446884     | 1.427585     |
-| x          | 0.028157     | 0.044483     | 0.051159     |
-| y          | 0.040524     | 0.035687     | 0.046307     |
-| w          | 0.078980     | 0.066310     | 0.027984     |
-| h          | 0.133414     | 0.094540     | 0.037121     |
-| conf       | 1.234448     | 1.165665     | 1.223495     |
-| cls        | 0.039402     | 0.040198     | 0.041520     |
-| cls_acc    | 44.44%       | 43.59%       | 32.50%       |
-| recall50   | 0.361111     | 0.384615     | 0.300000     |
-| recall75   | 0.222222     | 0.282051     | 0.300000     |
-| precision  | 0.520000     | 0.300000     | 0.070175     |
-| conf_obj   | 0.599058     | 0.622685     | 0.651472     |
-| conf_noobj | 0.003778     | 0.004039     | 0.004044     |
+| grid_size  | 11           | 22           | 44           |
+| loss       | 78.568298    | 75.857491    | 79.995689    |
+| x          | 0.044378     | 0.086360     | 0.068668     |
+| y          | 0.018975     | 0.152630     | 0.099213     |
+| w          | 0.363917     | 1.900934     | 4.415801     |
+| h          | 0.330206     | 0.037664     | 4.148860     |
+| conf       | 77.089592    | 73.024803    | 70.526222    |
+| cls        | 0.721232     | 0.655100     | 0.736922     |
+| cls_acc    | 0.00%        | 0.00%        | 0.00%        |
+| recall50   | 0.000000     | 0.000000     | 0.000000     |
+| recall75   | 0.000000     | 0.000000     | 0.000000     |
+| precision  | 0.000000     | 0.000000     | 0.000000     |
+| conf_obj   | 0.485040     | 0.479717     | 0.502489     |
+| conf_noobj | 0.524801     | 0.509523     | 0.499409     |
 +------------+--------------+--------------+--------------+
-Total Loss 4.429395
----- ETA 0:35:48.821929
+Total loss 234.42147827148438
+---- ETA 0:00:00.551487
 ```
 
-#### Tensorboard
+## Test
+
+Outputs in MODEL_NAME/eval/
+
+- parameters.txt
+- PRETRAINED_WEIGHTS_batch_results_iou_IOU_THRES.csv
+- PRETRAINED_WEIGHTS_map_iou_IOU_THRES.csv
+- PRETRAINED_WEIGHTS_predictions_iou_IOU_THRES.csv
+
+```
+$ python3 test.py [-h] [--model_name MODEL_NAME]
+                [--batch_size BATCH_SIZE]
+                [--model_def MODEL_DEF] 
+                [--data_config DATA_CONFIG]
+                [--pretrained_weights PRETRAINED_WEIGHTS] 
+                [--n_cpu N_CPU]
+                [--img_size IMG_SIZE]
+                [--conf_thres CONF_THRES]
+                [--nms_thres NMS_THRES]
+                [--iou_thres IOU_THRES]
+```
+
+#### Test example
+To test on cars validation set using our previous Darknet53 model.
+```
+$ python3 test.py --model_name darknet_cars --data_config config/cars_small.data  --pretrained_weights weights/darknet53.conv.74
+```
+
+## Detections
+Uses pretrained weights to draw bounding boxes on images and make predictions. 
+
+Outputs in MODEL_NAME/:
+
+- detections (predictions per image)
+- img_boxes (image with bounding boxes)
+
+
+```
+$ python3 test.py [-h] [--model_name MODEL_NAME]
+                [--image_path IMAGE_PATH]
+                [--batch_size BATCH_SIZE]
+                [--model_def MODEL_DEF] 
+                [--pretrained_weights PRETRAINED_WEIGHTS] 
+                [--class_Path CLASS_PATH]
+                [--n_cpu N_CPU]
+                [--img_size IMG_SIZE]
+                [--conf_thres CONF_THRES]
+                [--nms_thres NMS_THRES]
+                [--iou_thres IOU_THRES]
+                [--checkpoint_model CHECKPOINT_MODEL]
+```
+#### Detect example 
+To produce predictions and bounding boxes on cars validation images.
+```
+$ python3 detect.py --model_name darknet_cars --checkpoint_model darknet_cars/checkpoint/darknet_cars_checkpoint_10
+```
+
+## Tensorboard
 Track training progress in Tensorboard:
+
 * Initialize training
 * Run the command below
 * Go to http://localhost:6006/
@@ -109,28 +164,49 @@ $ bash create_custom_model.sh <num-classes> # Will create custom model 'yolov3-c
 ```
 
 #### Classes
-Add class names to `data/custom/classes.names`. This file should have one row per class name.
+Add class names to `data/custom/classes.names`. This file should have one row per class name.  The last row should be empty.
+
+```
+sedan
+hatchback
+bus
+pickup
+minibus
+van
+truck
+motorcycle
+suv
+
+```
 
 #### Image Folder
-Move the images of your dataset to `data/custom/images/`.
+Move the images of your dataset to `data/custom/train_images/` and `data/custom/valid_images`.
 
 #### Annotation Folder
-Move your annotations to `data/custom/labels/`. The dataloader expects that the annotation file corresponding to the image `data/custom/images/train.jpg` has the path `data/custom/labels/train.txt`. Each row in the annotation file should define one bounding box, using the syntax `label_idx x_center y_center width height`. The coordinates should be scaled `[0, 1]`, and the `label_idx` should be zero-indexed and correspond to the row number of the class name in `data/custom/classes.names`.
+Move your annotations to `data/custom/train_labels/` and `data/custom/valid_labels/`. 
+The dataloader expects that the annotation file corresponding to the image `data/custom/images/train.jpg` has the path `data/custom/labels/train.txt`. Each row in the annotation file should define one bounding box, using the syntax `label_idx x_center y_center width height`. The coordinates should be scaled `[0, 1]`, and the `label_idx` should be zero-indexed and correspond to the row number of the class name in `data/custom/classes.names`.
+
+Example: nexet_000003.txt
+```
+0.0 0.4527777777777344 0.4762845849798611 0.07222222222265628 0.09486166007916666
+5.0 0.10833333333320312 0.5217391304354166 0.13666666666640626 0.20158102766805558
+```
 
 #### Define Train and Validation Sets
-In `data/custom/train.txt` and `data/custom/valid.txt`, add paths to images that will be used as train and validation data respectively.
+List the paths to all the images in the train_images folder to `data/custom/train.txt` and the paths to all the images 
+in valid_images folder to `data/custom/valid.txt`.  
 
-#### Train
-To train on the custom dataset run:
+To create a `train.txt`, run the commands:
 
 ```
-$ python3 train.py --model_def config/yolov3-custom.cfg --data_config config/custom.data
+$ cd data/custom/train_images/
+$ printf '%s\n' "$PWD"/* > train.txt
+$ mv train.txt ../.
 ```
-
-Add `--pretrained_weights weights/darknet53.conv.74` to train using a backend pretrained on ImageNet.
-
 
 ## Credit
+
+Original Darknet53 model from below.
 
 ### YOLOv3: An Incremental Improvement
 _Joseph Redmon, Ali Farhadi_ <br>
@@ -158,3 +234,5 @@ https://pjreddie.com/yolo/.
   year={2018}
 }
 ```
+
+
