@@ -1,0 +1,4 @@
+classes= 9
+train=data/cars/train.txt
+valid=data/cars/valid.txt
+names=data/cars/classes.names
