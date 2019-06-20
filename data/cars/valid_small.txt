@@ -1,0 +1,10 @@
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000003.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000013.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000017.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000019.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000022.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000025.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000031.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000037.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000043.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/valid_images/nexet_000047.jpg

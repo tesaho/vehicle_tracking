@@ -1,0 +1,8 @@
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00001.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00002.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00003.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00004.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00005.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00006.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00007.jpg
+/home/tesa/PycharmProjects/cs230/vehicle_tracking/pytorch_models/PyTorch_YOLOv3/data/cars/images/00008.jpg
